@@ -85,7 +85,7 @@ class Graph:
                 #         node=self.Graph.nodes[node]["name"]))
                 for path in paths:
                     self.pathReturn = path
-                    str = "{node} -> ".format(
+                    str = "( {node}-> ".format(
                         node=self.Graph.nodes[node]["name"])
                     weight = 0
                     run = 0
@@ -94,7 +94,7 @@ class Graph:
                             str += "{n}".format(
                                 n=self.Graph.nodes[n]["name"])
                         else:
-                            str += " -> {n}".format(
+                            str += "-> {n}".format(
                                 n=self.Graph.nodes[n]["name"])
 
                         if (self.Graph.nodes[n]["type"] == "player"):
@@ -104,7 +104,7 @@ class Graph:
 
                         run += 1
                     run = 0
-                    print("path{pathNum}: [ path: {str} | weight: {weight} ]".format(
+                    print("path{pathNum}: [ path: {str}) | weight: {weight} ]".format(
                         pathNum=pathNum, weight=weight, str=str))
                     str = ""
                     pathNum += 1
