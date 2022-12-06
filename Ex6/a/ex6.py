@@ -42,7 +42,7 @@ class OrderlyDivision:
                 return v[1]
         raise Exception("Error while search specific value in values")
 
-    def mergeSortByPreference(self, arr) -> list:
+    def mergeSortByPreference(self, arr, order='>') -> list:
         if len(arr) > 1:
             # Create sub_array2 ← A[start..mid] and sub_array2 ← A[mid+1..end]
             mid = len(arr)//2
@@ -60,12 +60,22 @@ class OrderlyDivision:
                 # print('{val1} < {val2}   |    {valid}'.format(
                 #     val1=sub_array1[i][1], val2=sub_array2[j][1], valid=sub_array1[i][1] < sub_array2[j][1]))
                 # print('condition: ', sub_array1[i][1] < sub_array2[j][1])
-                if sub_array1[i][1] < sub_array2[j][1]:
-                    arr[k] = sub_array1[i]
-                    i += 1
+
+                if order == '>':
+                    if sub_array1[i][1] > sub_array2[j][1]:
+                        arr[k] = sub_array1[i]
+                        i += 1
+                    else:
+                        arr[k] = sub_array2[j]
+                        j += 1
+
                 else:
-                    arr[k] = sub_array2[j]
-                    j += 1
+                    if sub_array1[i][1] < sub_array2[j][1]:
+                        arr[k] = sub_array1[i]
+                        i += 1
+                    else:
+                        arr[k] = sub_array2[j]
+                        j += 1
                 k += 1
 
             # When all elements are traversed in either arr1 or arr2,
@@ -106,7 +116,6 @@ class OrderlyDivision:
 
             arr.append(obj)
         array = self.mergeSortByPreference(arr)
-        print('array', array)
         self.ratioCalcValues = array
 
     def validateRatio(self, playerB) -> bool:
@@ -139,6 +148,5 @@ if __name__ == "__main__":
     playerB = OrderlyDivision([[10, 0], [20, 1], [30, 0.6], [40, 0.3]])
     playerA = OrderlyDivision(
         [[40, 1], [30, 0], [20, 0.4], [10, 0.7]], playerB)
-
     print(playerA)
     # print(playerB)
