@@ -1,8 +1,7 @@
+from pprint import pprint
 import matplotlib.pyplot as plt
 import networkx as nx
-
-
-from pprint import pprint
+import names
 
 
 class Graph:
@@ -28,7 +27,7 @@ class Graph:
             id += 1
 
         for key in range(0, players):
-            playerName = "player{player} ".format(player=id)
+            playerName = "{player} ".format(player=names.get_full_name())
             str += "{playerName}: {values}\n".format(playerName=playerName,
                                                      values=MATRIX[key])
             self.Graph.add_node(id, name=playerName,
