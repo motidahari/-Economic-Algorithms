@@ -105,7 +105,7 @@ class Graph:
 
                         run += 1
                     run = 0
-                    print("pathNum: {pathNum} ,  weight: {weight}, path: {str}".format(
+                    print("path{pathNum}: [ path: {str} | weight: {weight} ]".format(
                         pathNum=pathNum, weight=weight, str=str))
                     str = ""
                     pathNum += 1
@@ -121,10 +121,6 @@ def find_cycle_in_consumption_graph(MATRIX: list[list[float]]):
     return Graph(MATRIX).get_cycle_in_consumption_graph()
 
 
-def printPath():
-    return Graph(MATRIX).printGraph()
-
-
 if __name__ == "__main__":
     MATRIX = [
         [0, 0, 0.9, 0.3, 1, 0.5],
@@ -133,4 +129,4 @@ if __name__ == "__main__":
     ]
     path = find_cycle_in_consumption_graph(MATRIX)
     print('path', path)
-    # printPath()
+    print()
