@@ -12,7 +12,7 @@ class Graph:
         if self.validateInput(MATRIX):
             self.createGraph(MATRIX)
             self.cycle_basis()
-            self.printGraph()
+            # self.printGraph()
         else:
             print('Error - validatin failed')
 
@@ -76,17 +76,16 @@ class Graph:
                 return False
         return True
 
-    def cycle_basis(self):
-
+    def cycle_basis(self) -> list:
         pathNum = 1
         for node in self.Graph.nodes():
             if (self.Graph.nodes[node]["type"] == "player"):
-
                 paths = nx.cycle_basis(self.Graph, node)
-                if (len(paths) == 0):
-                    print('No path on the graph')
+                # if (len(paths) == 0):
+                #     print('No path on the graph from node {node}'.format(
+                #         node=self.Graph.nodes[node]["name"]))
                 for path in paths:
-                    print('path', path)
+                    self.pathReturn = path
                     str = "{node} -> ".format(
                         node=self.Graph.nodes[node]["name"])
                     weight = 0
@@ -110,15 +109,28 @@ class Graph:
                         pathNum=pathNum, weight=weight, str=str))
                     str = ""
                     pathNum += 1
+                print()
+                self.pathReturn.insert(0, node)
                 pathNum += 1
 
+    def get_cycle_in_consumption_graph(self) -> list:
+        return self.pathReturn
 
-MATRIX = [
-    [0, 0, 0.9, 0.3, 1, 0.5],
-    [1, 0.5, 0, 0.3, 0, 0.5],
-    [0, 0.3, 0.1, 0.4, 0, 0],
-]
+
+def find_cycle_in_consumption_graph(MATRIX: list[list[float]]):
+    return Graph(MATRIX).get_cycle_in_consumption_graph()
+
+
+def printPath():
+    return Graph(MATRIX).printGraph()
 
 
 if __name__ == "__main__":
-    graph = Graph(MATRIX)
+    MATRIX = [
+        [0, 0, 0.9, 0.3, 1, 0.5],
+        [1, 0.5, 0, 0.3, 0, 0.5],
+        [0, 0.3, 0.1, 0.4, 0, 0],
+    ]
+    path = find_cycle_in_consumption_graph(MATRIX)
+    print('path', path)
+    # printPath()
