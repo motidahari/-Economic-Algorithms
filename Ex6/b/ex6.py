@@ -27,16 +27,17 @@ class Graph:
             id += 1
 
         for key in range(0, players):
-            playerName = "{player} ".format(player=names.get_full_name())
+            playerName = "{player} ".format(
+                player=names.get_full_name().split(" ")[0])
             str += "{playerName}: {values}\n".format(playerName=playerName,
                                                      values=MATRIX[key])
-            self.Graph.add_node(id, name=playerName,
+            self.Graph.add_node(playerName, name=playerName,
                                 data=MATRIX[key], type='player', color="blue")
             item = 0
             for value in MATRIX[key]:
                 if (value > 0):
-                    self.Graph.add_edge(id, item, weight=value)
-                    self.Graph.add_edge(item, id, weight=value)
+                    self.Graph.add_edge(playerName, item, weight=value)
+                    self.Graph.add_edge(item, playerName, weight=value)
                 item += 1
             item = 0
             id += 1
@@ -51,14 +52,14 @@ class Graph:
             data=True) if v["type"] == 'item']
 
         nx.draw_networkx_nodes(
-            self.Graph, pos, nodelist=listPlayers,  node_size=1000, node_color='y')
+            self.Graph, pos, nodelist=listPlayers,  node_size=2000, node_color='y')
         nx.draw_networkx_nodes(
             self.Graph, pos, nodelist=listItems,  node_size=500, node_color='g')
 
         nx.draw_networkx_edges(self.Graph, pos, width=6)
 
         nx.draw_networkx_labels(
-            self.Graph, pos, font_size=20, font_family="sans-serif")
+            self.Graph, pos, font_size=10, font_family="sans-serif")
         edge_labels = nx.get_edge_attributes(self.Graph, "weight")
         nx.draw_networkx_edge_labels(self.Graph, pos, edge_labels)
 
@@ -80,9 +81,9 @@ class Graph:
         for node in self.Graph.nodes():
             if (self.Graph.nodes[node]["type"] == "player"):
                 paths = nx.cycle_basis(self.Graph, node)
-                # if (len(paths) == 0):
-                #     print('No path on the graph from node {node}'.format(
-                #         node=self.Graph.nodes[node]["name"]))
+                if (len(paths) == 0):
+                    print('No path on the graph from node {node}'.format(
+                        node=self.Graph.nodes[node]["name"]))
                 for path in paths:
                     self.pathReturn = path
                     str = "( {node}-> ".format(
@@ -108,24 +109,27 @@ class Graph:
                         pathNum=pathNum, weight=weight, str=str))
                     str = ""
                     pathNum += 1
-                print()
-                self.pathReturn.insert(0, node)
-                pathNum += 1
+                    print()
+                    self.pathReturn.insert(0, node)
+                    pathNum += 1
 
     def get_cycle_in_consumption_graph(self) -> list:
         return self.pathReturn
 
 
 def find_cycle_in_consumption_graph(MATRIX: list[list[float]]):
-    return Graph(MATRIX).get_cycle_in_consumption_graph()
+    graph = Graph(MATRIX)
+    graph.printGraph()
+    return graph.get_cycle_in_consumption_graph()
 
 
 if __name__ == "__main__":
     MATRIX = [
-        [0, 0, 0.9, 0.3, 1, 0.5],
+        [0, 0.2, 0.9, 0.3, 1, 0.5],
         [1, 0.5, 0, 0.3, 0, 0.5],
         [0, 0.3, 0.1, 0.4, 0, 0],
     ]
     path = find_cycle_in_consumption_graph(MATRIX)
+
     print('path', path)
     print()
