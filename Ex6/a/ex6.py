@@ -9,30 +9,37 @@ agents = ami = tami = rami = None
 
 
 class OrderlyDivision:
-    def __init__(self, values: list, playerB=None):
+    def __init__(self, values: list):
         self.order = '>'
         self.values = self.mergeSortByPreference(values)
-        if playerB is not None:
-            self.playerB = playerB
-            self.ratioCalculation()
-        else:
-            self.playerB = None
-            self.ratioCalcValues = None
 
-    def getValues(self) -> float:
+    def getValues(self) -> list:
         if len(self.values) == 0:
             return []
         return self.values
 
-    def getRatioCalcValues(self) -> float:
+    def getItems(self) -> list:
+        if len(self.items) == 0:
+            return []
+        return self.items
+
+    def setValuesOtherPlayer(self, otherPlayer=None) -> None:
+        if otherPlayer is not None:
+            self.otherPlayer = otherPlayer
+            self.ratioCalculation()
+        else:
+            self.otherPlayer = None
+            self.ratioCalcValues = None
+
+    def getRatioCalcValues(self) -> list:
         if len(self.ratioCalcValues) == 0:
             return []
-        return self.values
+        return self.ratioCalcValues
 
-    def getpPlayerB(self):
-        if self.playerB is None:
+    def getOtherPlayer(self):
+        if self.otherPlayer is None:
             return None
-        return self.playerB
+        return self.otherPlayer
 
     def getPreferenceByValue(self, value: int) -> float:
         x = range(len(self.values))
@@ -41,6 +48,27 @@ class OrderlyDivision:
             if v[0] == value:
                 return v[1]
         raise Exception("Error while search specific value in values")
+
+    def getPreferenceByValueFromRatioCalculation(self, value: int) -> float:
+        x = range(len(self.ratioCalcValues))
+        for idx, v in enumerate(self.values):
+            # print('idx = {idx} , v = {v}'.format(idx=idx, v=v))
+            if v[0] == value:
+                return v[1]
+        raise Exception("Error while search specific value in values")
+
+    def checkOrderlyDivision(self) -> bool:
+        otherFlayer = self.getOtherPlayer()
+        if (otherFlayer == None):
+            raise Exception("Error - other player is not exist")
+
+        for idx, v in enumerate(self.ratioCalcValues):
+            item = v[0]
+            valueA = v[1]
+            valueB = otherFlayer.getPreferenceByValueFromRatioCalculation(item)
+            if (valueB > valueA):
+                return False
+        return True
 
     def mergeSortByPreference(self, arr, order='>') -> list:
         if len(arr) > 1:
@@ -95,7 +123,7 @@ class OrderlyDivision:
         return arr
 
     def ratioCalculation(self) -> None:
-        if len(self.values) != len(self.playerB.getValues()):
+        if len(self.values) != len(self.otherPlayer.getValues()):
             raise Exception(
                 "Error while call to ratioCalculation, arrays is not are the same size")
 
@@ -106,33 +134,31 @@ class OrderlyDivision:
             obj = []
             valP1 = v[0]
             preferenceP1 = v[1]
-            preferenceP2 = self.playerB.getPreferenceByValue(valP1)
+            preferenceP2 = self.otherPlayer.getPreferenceByValue(valP1)
             obj.append(valP1)
 
             try:
-                obj.append(round(preferenceP1/preferenceP2, 2))
+                obj.append(preferenceP1/preferenceP2)
             except:
-                obj.append(1)
+                obj.append(float('inf'))
 
             arr.append(obj)
         array = self.mergeSortByPreference(arr)
         self.ratioCalcValues = array
-
-    def validateRatio(self, playerB) -> bool:
-        # self.ratioCalculation(playerB)
-        print(self.values)
+        self.items = []
+        for i in self.ratioCalcValues:
+            self.items.append(i[0])
 
     def __str__(self) -> str:
         string = ''
         string += 'Player values:\n\n'
-        string += 'values:\nValue:\tPreference:\n'
+        string += 'Player values:\nValue:\tPreference:\n'
         string += '\n'.join(['\t'.join([str(cell)
                                         for cell in row]) for row in self.values]) + '\n\n'
-
-        if self.playerB is not None:
-            string += 'playerB:\nValue:\tPreference:\n'
-            string += '\n'.join(['\t'.join([str(cell)
-                                            for cell in row]) for row in playerB.getValues()]) + '\n\n'
+        # if self.otherPlayer is not None:
+        #     string += 'OtherPlayer:\nValue:\tPreference:\n'
+        #     string += '\n'.join(['\t'.join([str(cell)
+        #                                     for cell in row]) for row in self.otherPlayer.getValues()]) + '\n\n'
 
         if self.ratioCalcValues is not None:
 
@@ -140,13 +166,102 @@ class OrderlyDivision:
             string += 'Value:\tPreference:\n'
             string += '\n'.join(['\t'.join([str(cell)
                                             for cell in row]) for row in self.ratioCalcValues]) + '\n\n'
+        string += 'Player items: {items}\n'.format(items=self.items)
 
         return string
 
+    def getString(self) -> str:
+        string = ''
+        string += 'Player values:\n\n'
+        string += 'Player values:\nValue:\tPreference:\n'
+        string += '\n'.join(['\t'.join([str(cell)
+                                        for cell in row]) for row in self.values]) + '\n\n'
+        # if self.otherPlayer is not None:
+        #     string += 'OtherPlayer:\nValue:\tPreference:\n'
+        #     string += '\n'.join(['\t'.join([str(cell)
+        #                                     for cell in row]) for row in self.otherPlayer.getValues()]) + '\n\n'
+
+        if self.ratioCalcValues is not None:
+
+            string += 'ratioCalcValues from playerA to PlayerB:\n'
+            string += 'Value:\tPreference:\n'
+            string += '\n'.join(['\t'.join([str(cell)
+                                            for cell in row]) for row in self.ratioCalcValues]) + '\n\n'
+        string += 'Player items: {items}\n ********************************************\n\n'.format(
+            items=self.items)
+
+        return string
+
+    def getSumByItems(self, list: list) -> float:
+        sum = 0
+        for item in list:
+            for val in self.values:
+                if (item == val[0]):
+                    sum += val[1]
+        return sum
+
+
+def algo(playerA: OrderlyDivision, playerB: OrderlyDivision):
+    result = ''
+    # step a
+    playerA.setValuesOtherPlayer(playerB)
+    playerB.setValuesOtherPlayer(playerA)
+    result += playerA.getString()
+    result += playerB.getString()
+    # result += '********************************************\n\n'
+
+    check = playerA.checkOrderlyDivision()
+    if (check == True):
+        return True
+    result += 'checkOrderlyDivision = false\n'
+    # step b
+    sumPlayerA = playerA.getSumByItems(playerA.getItems())
+    sumPlayerB = 0
+    items = playerA.getItems()
+    itemsPlayerA = items
+    itemsPlayerB = []
+    # step c,d
+    for item in range(len(items) - 1, -1, -1):
+        sumPlayerA = playerA.getSumByItems(itemsPlayerA)
+        sumPlayerB = playerB.getSumByItems(itemsPlayerB)
+        itemVal = items[item]
+        priceItemPlayerA = playerA.getPreferenceByValue(itemVal)
+        priceItemPlayerB = playerA.getOtherPlayer().getPreferenceByValue(itemVal)
+        if (sumPlayerA == sumPlayerB):
+            break
+        if (sumPlayerA > sumPlayerB) and (sumPlayerB + priceItemPlayerB > sumPlayerA - priceItemPlayerA):
+            checkA = sumPlayerA - priceItemPlayerA
+            checkB = sumPlayerB + priceItemPlayerB
+            result += 'sumPlayerA: {sumPlayerA}\n'.format(
+                sumPlayerA=sumPlayerA)
+            result += 'sumPlayerB: {sumPlayerB}\n'.format(
+                sumPlayerB=sumPlayerB)
+            splitItem = round(abs(checkA - checkB) / 2, 2)
+            result += 'checkA(sumPlayerA - priceItemPlayerA): {checkA}\n'.format(
+                checkA=round(checkA, 2))
+            result += 'checkB(sumPlayerB + priceItemPlayerB): {checkB}\n'.format(
+                checkB=round(checkB, 2))
+
+            result += 'item: {item} , splitItem: {splitItem}\n'.format(
+                item=items[item], splitItem=splitItem)
+            result += 'splitItem: {splitItem}\n\n'.format(splitItem=splitItem)
+            sumPlayerA -= priceItemPlayerA - splitItem
+            sumPlayerB += priceItemPlayerB - splitItem
+            itemsPlayerB.append(itemVal)
+
+            break
+        else:
+            itemsPlayerA.remove(itemVal)
+            itemsPlayerB.append(itemVal)
+            sumPlayerA -= priceItemPlayerA
+            sumPlayerB += priceItemPlayerB
+
+    result += 'result:\n itemsPlayerA: {itemsPlayerA}, totalPriceA: {sumPlayerA}\n itemsPlayerB: {itemsPlayerB}, totalPriceB: {sumPlayerB}\n'.format(itemsPlayerA=itemsPlayerA, sumPlayerA=round(sumPlayerA, 2),
+                                                                                                                                                     itemsPlayerB=itemsPlayerB, sumPlayerB=round(sumPlayerB, 2))
+    return result
+
 
 if __name__ == "__main__":
+    playerA = OrderlyDivision([[40, 1], [30, 0], [20, 0.4], [10, 0.7]])
     playerB = OrderlyDivision([[10, 0], [20, 1], [30, 0.6], [40, 0.3]])
-    playerA = OrderlyDivision(
-        [[40, 1], [30, 0], [20, 0.4], [10, 0.7]], playerB)
-    print(playerA)
-    # print(playerB)
+    print(algo(playerA, playerB))
