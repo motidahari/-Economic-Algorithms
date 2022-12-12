@@ -2,7 +2,7 @@ import itertools
 """
     Ex6 - Economic-Algorithms
     Name - Moti Dahari
-    Id - 308212570
+    
     Github link - https://github.com/motidahari/Economic-Algorithms
 """
 agents = ami = tami = rami = None
