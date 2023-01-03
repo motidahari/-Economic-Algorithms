@@ -1,3 +1,6 @@
+import doctest
+
+
 def initialization(subjects: list[str]):
     """
         This function takes in a list of subjects and returns two dictionaries initialized to 0:
@@ -138,7 +141,76 @@ def run(subjects: list[str], donations: list[list[str]], sum: float, number: int
     print("=============================\n\n")
 
 
+def tests():
+    # Test with a single subject and single donor
+    total = 100
+    subjects = ["Education"]
+    preferences = [["Education"]]
+    citizen_donate, total_donate = conditional_utilitarian(
+        total, subjects, preferences)
+    assert citizen_donate == [{"Education": 100}]
+    assert total_donate == {"Education": 100}
+
+    # Test with multiple subjects and single donor
+    total = 100
+    subjects = ["Education", "Healthcare", "Environmental Protection"]
+    preferences = [["Education", "Healthcare"]]
+    citizen_donate, total_donate = conditional_utilitarian(
+        total, subjects, preferences)
+
+    assert citizen_donate == [{"Education": 50, "Healthcare": 50}]
+    assert total_donate == {"Education": 50,
+                            "Healthcare": 50, 'Environmental Protection': 0}
+
+ # Test with equal number of donors and subjects
+    total = 100
+    subjects = ["Education", "Healthcare", "Environmental Protection"]
+    preferences = [
+        ["Education"],
+        ["Healthcare"],
+        ["Environmental Protection"]
+    ]
+    citizen_donate, total_donate = conditional_utilitarian(
+        total, subjects, preferences)
+    assert citizen_donate == [{'Education': 33.333333333333336}, {
+        'Healthcare': 33.333333333333336}, {'Environmental Protection': 33.333333333333336}]
+    assert total_donate == {'Education': 33.333333333333336,
+                            'Healthcare': 33.333333333333336, 'Environmental Protection': 33.333333333333336}
+
+
+# Test with more donors than subjects
+    total = 100
+    subjects = ["Education", "Healthcare"]
+    preferences = [
+        ["Education"],
+        ["Healthcare"],
+        ["Education"],
+        ["Healthcare"]
+    ]
+    citizen_donate, total_donate = conditional_utilitarian(
+        total, subjects, preferences)
+    assert citizen_donate == [{'Education': 25.0}, {
+        'Healthcare': 25.0}, {'Education': 25.0}, {'Healthcare': 25.0}]
+    assert total_donate == {'Education': 50.0, 'Healthcare': 50.0}
+
+    # Test with more subjects than donors
+    total = 100
+    subjects = ["Education", "Healthcare", "Environmental Protection"]
+    preferences = [
+        ["Education", "Healthcare"],
+        ["Healthcare", "Environmental Protection"]
+    ]
+    citizen_donate, total_donate = conditional_utilitarian(
+        total, subjects, preferences)
+
+    assert citizen_donate == [{'Healthcare': 50.0}, {'Healthcare': 50.0}]
+    assert total_donate == {'Education': 0,
+                            'Healthcare': 100.0, 'Environmental Protection': 0}
+
+
 if __name__ == "__main__":
+    doctest.testmod()
+    tests()
     subjects = []
     donations = []
     sums = []
